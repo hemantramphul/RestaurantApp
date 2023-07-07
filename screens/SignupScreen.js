@@ -19,6 +19,7 @@ const SignupScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [errorEmail, setErrorEmail] = useState("");
 
   const signupUser = (event) => {
     if (email === "" && password === "") {
@@ -27,11 +28,7 @@ const SignupScreen = ({ navigation }) => {
       event.preventDefault();
       setError("");
       if (validatePassword()) {
-        register();
       }
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
     }
   };
 
@@ -60,24 +57,39 @@ const SignupScreen = ({ navigation }) => {
     return isValid;
   };
 
+  const validateEmail = (email) => {
+    let isValid = false;
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+    setErrorEmail("");
+    if (reg.test(email) !== false) {
+      isValid = true;
+    } else {
+      setErrorEmail("Email is not correct");
+    }
+    setEmail(email);
+
+    return isValid;
+  };
+
   return (
     <View style={styles.container}>
       <TextInput
-        style={styles.inputBox}
+        style={errorEmail ? styles.inputBoxError : styles.inputBox}
         value={email}
-        onChangeText={(email) => setEmail(email)}
+        onChangeText={(email) => validateEmail(email)}
         placeholder="Emails"
         autoCapitalize="none"
       />
+      {errorEmail !== "" && <Text style={styles.error}>{errorEmail}</Text>}
       <TextInput
-        style={styles.inputBox}
+        style={error ? styles.inputBoxError : styles.inputBox}
         value={password}
         onChangeText={(password) => setPassword(password)}
         placeholder="Password"
         secureTextEntry={true}
       />
       <TextInput
-        style={styles.inputBox}
+        style={error ? styles.inputBoxError : styles.inputBox}
         value={confirmPassword}
         onChangeText={(confirmPassword) => setConfirmPassword(confirmPassword)}
         placeholder="Confirm Password"
@@ -127,6 +139,14 @@ const styles = StyleSheet.create({
     borderColor: "#d3d3d3",
     borderBottomWidth: 2,
   },
+  inputBoxError: {
+    width: "85%",
+    margin: 10,
+    padding: 15,
+    fontSize: 16,
+    borderColor: "red",
+    borderBottomWidth: 2,
+  },
   button: {
     marginTop: 30,
     marginBottom: 20,
@@ -153,8 +173,8 @@ const styles = StyleSheet.create({
   },
   error: {
     color: "red",
-    marginTop: 10,
-    fontSize: 16,
+    marginTop: 0,
+    fontSize: 10,
     textAlign: "center",
   },
 });
