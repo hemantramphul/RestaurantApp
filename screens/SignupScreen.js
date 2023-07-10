@@ -1,9 +1,6 @@
 import { useState } from "react";
-import auth from "../database/firebase";
-import {
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-} from "firebase/auth";
+import { auth } from "../database/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 import {
   View,
@@ -12,38 +9,53 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 
 const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [errorEmail, setErrorEmail] = useState("");
 
-  const signupUser = (event) => {
+  const registerUser = (e) => {
     if (email === "" && password === "") {
-      setError("Enter details to signup!");
+      Alert.alert("Enter details to signup!");
     } else {
-      event.preventDefault();
-      setError("");
-      if (validatePassword()) {
+      e.preventDefault();
+      setIsLoading(true);
+      if (validatePassword() && validatePassworLength(password)) {
+        // Create a new user with email and password using firebase
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((res) => {
+            console.log(res.user);
+            console.log("User registered successfully!");
+            navigation.navigate("Login");
+          })
+          .catch((err) => {
+            setError(err.message);
+            console.log(err);
+          });
       }
+
+      setIsLoading(false);
     }
   };
 
-  const register = () => {
-    // Create a new user with email and password using firebase
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        sendEmailVerification(auth.currentUser)
-          .then(() => {
-            Alert.alert("User create successfully");
-            navigation.navigate("Login");
-          })
-          .catch((err) => Alert.alert(err.message));
-      })
-      .catch((err) => setError(err.message));
+  const validatePassworLength = (password) => {
+    let isValid = false;
+    setPassword(password);
+
+    if (password !== "" && password.length >= 6) {
+      isValid = true;
+      setError("");
+    } else {
+      setError("Passwords too short.");
+    }
+
+    return isValid;
   };
 
   const validatePassword = () => {
@@ -73,6 +85,12 @@ const SignupScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {isLoading && (
+        <View style={styles.preloader}>
+          <ActivityIndicator size="large" color="#9E9E9E" />
+        </View>
+      )}
+
       <TextInput
         style={errorEmail ? styles.inputBoxError : styles.inputBox}
         value={email}
@@ -84,7 +102,7 @@ const SignupScreen = ({ navigation }) => {
       <TextInput
         style={error ? styles.inputBoxError : styles.inputBox}
         value={password}
-        onChangeText={(password) => setPassword(password)}
+        onChangeText={(password) => validatePassworLength(password)}
         placeholder="Password"
         secureTextEntry={true}
       />
@@ -97,7 +115,7 @@ const SignupScreen = ({ navigation }) => {
       />
       {error !== "" && <Text style={styles.error}>{error}</Text>}
 
-      <TouchableOpacity style={styles.button} onPress={signupUser}>
+      <TouchableOpacity style={styles.button} onPress={registerUser}>
         <Text style={styles.buttonText}>Signup</Text>
       </TouchableOpacity>
 
@@ -176,6 +194,17 @@ const styles = StyleSheet.create({
     marginTop: 0,
     fontSize: 10,
     textAlign: "center",
+  },
+  preloader: {
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.47)",
+    zIndex: 999,
   },
 });
 
