@@ -6,14 +6,14 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyANn9HUtdh1WbnE66NqelcHpClq8_eFkjk",
-  authDomain: "restaurantapp-c11ba.firebaseapp.com",
-  projectId: "restaurantapp-c11ba",
-  storageBucket: "restaurantapp-c11ba.appspot.com",
-  messagingSenderId: "308919789601",
-  appId: "1:308919789601:web:ec8152190bb7a2cf645b60",
+  apiKey: "AIzaSyCLxTttQRfmQVsXam8-SFXb9vFhYJGN_lI",
+  authDomain: "healthtracker-3202e.firebaseapp.com",
+  databaseURL: "https://healthtracker-3202e-default-rtdb.firebaseio.com",
+  projectId: "healthtracker-3202e",
+  storageBucket: "healthtracker-3202e.appspot.com",
+  messagingSenderId: "1004953969059",
+  appId: "1:1004953969059:web:cfcc2c66bb5ef5b41dba16",
 };
-
 // Initialize Firebase and Firebase Authentication
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
